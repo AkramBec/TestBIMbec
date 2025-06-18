@@ -14,8 +14,8 @@
     Width="800">
     <Grid>
         <TextBlock
-            Text="SearchFittingsInParkingSpaces"
-            FontSize="60"
+            Text="Запуск команды"
+            FontSize="30"
             VerticalAlignment="Center"
             HorizontalAlignment="Center" />
     </Grid>

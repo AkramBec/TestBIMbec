@@ -1,4 +1,6 @@
-﻿using Nice3point.Revit.Toolkit.External;
+﻿using JetBrains.Annotations;
+using Nice3point.Revit.Extensions;
+using Nice3point.Revit.Toolkit.External;
 using SearchFittingsInParkingSpaces.Commands;
 
 namespace SearchFittingsInParkingSpaces
@@ -16,9 +18,9 @@ namespace SearchFittingsInParkingSpaces
 
         private void CreateRibbon()
         {
-            var panel = Application.CreatePanel("Commands", "SearchFittingsInParkingSpaces");
+            var panel = Application.CreatePanel("Машиноместо", "ТЗ Бешшар");
 
-            panel.AddPushButton<StartupCommand>("Execute")
+            panel.AddPushButton<StartupCommand>("Поиск арматуры")
                 .SetImage("/SearchFittingsInParkingSpaces;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/SearchFittingsInParkingSpaces;component/Resources/Icons/RibbonIcon32.png");
         }
