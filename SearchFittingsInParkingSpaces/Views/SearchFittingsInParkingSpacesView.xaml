@@ -9,14 +9,18 @@
     d:DataContext="{d:DesignInstance viewModel:SearchFittingsInParkingSpacesViewModel}"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterScreen"
-    Title="SearchFittingsInParkingSpaces"
+    Title="Поиск арматуры над парковочным местом"
     Height="450"
     Width="800">
     <Grid>
-        <TextBlock
-            Text="Запуск команды"
-            FontSize="30"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center" />
+        <StackPanel>
+            <Button Content="Найти арматуру"
+                    Command="{Binding FindFittingsCommand}"
+                    Margin="0,0,0,10"
+                    Width = "200"/>
+            <TextBlock Text = "Найденные элементы:" FontWeight="Bold" Margin="0,10,0,5"/>
+            
+            <ListBox ItemsSource="{Binding ElementIds}" Height="300"/>
+        </StackPanel>
     </Grid>
 </Window>

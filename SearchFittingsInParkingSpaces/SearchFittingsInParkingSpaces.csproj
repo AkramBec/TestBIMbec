@@ -64,7 +64,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Models" />
         <Folder Include="obj" />
     </ItemGroup>
 

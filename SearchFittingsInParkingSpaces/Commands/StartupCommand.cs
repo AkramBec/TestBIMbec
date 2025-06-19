@@ -14,7 +14,7 @@ namespace SearchFittingsInParkingSpaces.Commands
     {
         public override void Execute()
         {
-            var viewModel = new SearchFittingsInParkingSpacesViewModel();
+            var viewModel = new SearchFittingsInParkingSpacesViewModel(UiDocument);
             var view = new SearchFittingsInParkingSpacesView(viewModel);
             view.Show(UiApplication.MainWindowHandle);
         }
