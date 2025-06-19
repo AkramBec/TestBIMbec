@@ -20,7 +20,9 @@
                     Width = "200"/>
             <TextBlock Text = "Найденные элементы:" FontWeight="Bold" Margin="0,10,0,5"/>
             
-            <ListBox ItemsSource="{Binding ElementIds}" Height="300"/>
+            <ListBox ItemsSource="{Binding Fittings}"
+                     SelectedItem="{Binding SelectedFitting, Mode=TwoWay}"
+                     Height="300"/>
         </StackPanel>
     </Grid>
 </Window>
