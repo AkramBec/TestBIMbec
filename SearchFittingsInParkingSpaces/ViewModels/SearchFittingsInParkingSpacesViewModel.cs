@@ -4,6 +4,8 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Nice3point.Revit.Toolkit;
+using Nice3point.Revit.Toolkit.External.Handlers;
 using SearchFittingsInParkingSpaces.Models;
 
 namespace SearchFittingsInParkingSpaces.ViewModels
@@ -11,6 +13,7 @@ namespace SearchFittingsInParkingSpaces.ViewModels
     public sealed partial class SearchFittingsInParkingSpacesViewModel : ObservableObject
     {
         private readonly UIDocument _uiDoc;
+        private readonly ActionEventHandler _actionEventHandler = new ActionEventHandler();
         public SearchFittingsInParkingSpacesViewModel(UIDocument uiDoc)
         {
             _uiDoc = uiDoc;
@@ -26,39 +29,27 @@ namespace SearchFittingsInParkingSpaces.ViewModels
         partial void OnSelectedFittingChanged(FittingInfo value)
         {
             if (value is null) return;
-            
-            var doc = _uiDoc.Document;
 
-            if (value.LinkInstanceId is null)
-            {
-                // Локальный элемент — выделяем
-                var elementId = new ElementId(value.ElementId);
-                _uiDoc.ShowElements(elementId);
-                _uiDoc.Selection.SetElementIds(new[] { elementId });
-            }
-            else
-            {
-                // Элемент из связи — выделяем саму связь
-                _uiDoc.ShowElements(value.LinkInstanceId);
-                _uiDoc.Selection.SetElementIds(new[] { value.LinkInstanceId });
+            _uiDoc.ShowElements(value.ViewId);
 
-                TaskDialog.Show("Информация",
-                    $"Элемент ID {value.ElementId} находится в связанной модели «{value.DocumentTitle}».\n" +
-                    "Revit не позволяет выделить элемент напрямую, но мы показали его связь.");
-            }
-            
         }
         
         [RelayCommand]
         private void FindFittings()
         {
-            Fittings.Clear();
+            _actionEventHandler.Raise(uiApp =>
+            {
+                var uiDoc = uiApp.ActiveUIDocument; 
+                var doc = uiDoc.Document;
+                var results = RebarOverParkingAnalyzer.FindFittingsOverParking(uiApp);
 
-            var doc = _uiDoc.Document;
-            var results = RebarOverParkingAnalyzer.FindFittingsOverParking(doc);
-
-            foreach (var fitting in results)
-                Fittings.Add(fitting);
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Fittings.Clear();
+                    foreach (var fitting in results)
+                        Fittings.Add(fitting);
+                });
+            });
         }
     }
 }

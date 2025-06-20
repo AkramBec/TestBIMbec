@@ -6,6 +6,8 @@ public class FittingInfo
     public string Category { get; set; }
     public string DocumentTitle { get; set; }
     public ElementId? LinkInstanceId { get; set; }
+    
+    public ElementId ViewId { get; set; }
 
     public override string ToString()
     {

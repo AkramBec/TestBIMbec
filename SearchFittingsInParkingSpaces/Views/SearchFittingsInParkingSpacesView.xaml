@@ -14,7 +14,7 @@
     Width="800">
     <Grid>
         <StackPanel>
-            <Button Content="Найти арматуру"
+            <Button Content="Найти арм"
                     Command="{Binding FindFittingsCommand}"
                     Margin="0,0,0,10"
                     Width = "200"/>

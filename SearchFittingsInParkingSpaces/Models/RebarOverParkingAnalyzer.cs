@@ -1,10 +1,18 @@
-﻿namespace SearchFittingsInParkingSpaces.Models;
+﻿using Autodesk.Revit.UI;
+
+namespace SearchFittingsInParkingSpaces.Models;
 
 public class RebarOverParkingAnalyzer
 {
-    public static List<FittingInfo> FindFittingsOverParking(Document doc)
+    public static List<FittingInfo> FindFittingsOverParking(UIApplication uiApp)
     {
+        var doc = uiApp.ActiveUIDocument.Document;
         var result = new List<FittingInfo>();
+        
+        var viewType = new FilteredElementCollector(doc).OfClass(typeof(ViewFamilyType))
+            .Cast<ViewFamilyType>()
+            .First(vft => vft.ViewFamily == ViewFamily.ThreeDimensional &&
+            vft.Name.Equals("Сгенерированный вид", StringComparison.OrdinalIgnoreCase));
 
         // Парковочные места
         var parkingPlaces = new FilteredElementCollector(doc)
@@ -36,35 +44,44 @@ public class RebarOverParkingAnalyzer
                 }))
                 .ToList();
 
-            result.AddRange(linkFittings.Select(e => new FittingInfo
+            foreach (var fitting in linkFittings)
             {
-                ElementId = e.Id.IntegerValue,
-                Category = e.Category?.Name?? "Нет категории",
-                DocumentTitle = linkDoc.Title,
-                LinkInstanceId = linkInstance.Id
-            }));
-        }
-        
-        // Арматура труб и воздуховодов в модели
-        
-        var mainFittings = new FilteredElementCollector(doc)
-            .WhereElementIsNotElementType()
-            .WherePasses(new ElementMulticategoryFilter(new[]
-            {
-                BuiltInCategory.OST_DuctFitting,
-                BuiltInCategory.OST_DuctTerminal,
-                BuiltInCategory.OST_PipeFitting
-            }))
-            .ToList();
-        
-        result.AddRange(mainFittings.Select(e => new FittingInfo
-        {
-            ElementId = e.Id.IntegerValue,
-            Category = e.Category?.Name?? "Нет категории",
-            DocumentTitle = doc.Title,
-            LinkInstanceId = null
-        }));
+                // Используем саму связь как точку обзора
+                var viewId = CreateIsometricViewWithSectionBox(doc, viewType, linkInstance);
 
+                result.Add(new FittingInfo
+                {
+                    ElementId = fitting.Id.IntegerValue,
+                    Category = fitting.Category?.Name ?? "Нет категории",
+                    DocumentTitle = linkDoc.Title,
+                    LinkInstanceId = linkInstance.Id,
+                    ViewId = viewId
+                });
+            }
+        }
         return result;
+    }
+    
+    private static ElementId CreateIsometricViewWithSectionBox(Document doc, ViewFamilyType viewType, Element element)
+    {
+        ElementId viewId = ElementId.InvalidElementId;
+        using (var tx = new Transaction(doc, "Create 3D View"))
+        {
+            tx.Start();
+            var view = View3D.CreateIsometric(doc, viewType.Id);
+            var box = element.get_BoundingBox(null);
+            if (box != null)
+            {
+                var expand = 0.5;
+                box.Min -= new XYZ(expand, expand, expand);
+                box.Max += new XYZ(expand, expand, expand);
+                view.SetSectionBox(box);
+            }
+
+            viewId = view.Id;
+            tx.Commit();
+        }
+
+        return viewId;
     }
 }
