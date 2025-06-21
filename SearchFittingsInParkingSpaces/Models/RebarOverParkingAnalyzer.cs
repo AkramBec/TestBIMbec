@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.UI;
+﻿using a;
+using Autodesk.Revit.UI;
 
 namespace SearchFittingsInParkingSpaces.Models;
 
@@ -42,15 +43,18 @@ public class RebarOverParkingAnalyzer
             {
                 var linkDoc = linkInstance.GetLinkDocument();
                 if (linkDoc == null) continue;
+                
+                string assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string folder = System.IO.Path.GetDirectoryName(assemblyPath);
+                string jsonPath = System.IO.Path.Combine(folder, "familyCategories.json");
+                List<BuiltInCategory> categories = CategoryLoader.LoadCategories(jsonPath);
+                
+                /*string jsonPath = @"C:\Path\To\familyCategories.json"; // Или путь рядом с DLL
+                List<BuiltInCategory> categories = CategoryLoader.LoadCategories(jsonPath);*/
 
                 var linkFittings = new FilteredElementCollector(linkDoc)
                     .WhereElementIsNotElementType()
-                    .WherePasses(new ElementMulticategoryFilter(new[]
-                    {
-                        BuiltInCategory.OST_PipeAccessory,
-                        BuiltInCategory.OST_DuctAccessory,
-                        BuiltInCategory.OST_DuctTerminal
-                    }))
+                    .WherePasses(new ElementMulticategoryFilter(categories))
                     .ToList();
 
                 foreach (var fitting in linkFittings)
