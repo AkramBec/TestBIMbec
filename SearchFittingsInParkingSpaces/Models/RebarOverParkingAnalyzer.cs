@@ -1,5 +1,4 @@
-﻿using a;
-using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.UI;
 
 namespace SearchFittingsInParkingSpaces.Models;
 
