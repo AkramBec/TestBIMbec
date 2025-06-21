@@ -6,13 +6,12 @@ public class RebarOverParkingAnalyzer
 {
     public static List<FittingInfo> FindFittingsOverParking(UIApplication uiApp)
     {
+        var uiDoc = uiApp.ActiveUIDocument;
         var doc = uiApp.ActiveUIDocument.Document;
+
         var result = new List<FittingInfo>();
-        
-        var viewType = new FilteredElementCollector(doc).OfClass(typeof(ViewFamilyType))
-            .Cast<ViewFamilyType>()
-            .First(vft => vft.ViewFamily == ViewFamily.ThreeDimensional &&
-            vft.Name.Equals("Сгенерированный вид", StringComparison.OrdinalIgnoreCase));
+
+        var viewType = new PluginView3D(doc).Type;
 
         // Парковочные места
         var parkingPlaces = new FilteredElementCollector(doc)
@@ -28,60 +27,80 @@ public class RebarOverParkingAnalyzer
             .Cast<RevitLinkInstance>();
         
         // Арматура труб и воздуховодов в связях
-
-        foreach (var linkInstance in links)
+        
+        View3D fallbackViewToActivate = null;
+        
+        using (var txDelete = new Transaction(doc, "Удаление старых видов"))
         {
-            var linkDoc = linkInstance.GetLinkDocument();
-            if (linkDoc == null) continue;
-
-            var linkFittings = new FilteredElementCollector(linkDoc)
-                .WhereElementIsNotElementType()
-                .WherePasses(new ElementMulticategoryFilter(new[]
-                {
-                    BuiltInCategory.OST_PipeFitting,
-                    BuiltInCategory.OST_DuctFitting,
-                    BuiltInCategory.OST_DuctTerminal
-                }))
-                .ToList();
-
-            foreach (var fitting in linkFittings)
-            {
-                // Используем саму связь как точку обзора
-                var viewId = CreateIsometricViewWithSectionBox(doc, viewType, linkInstance);
-
-                result.Add(new FittingInfo
-                {
-                    ElementId = fitting.Id.IntegerValue,
-                    Category = fitting.Category?.Name ?? "Нет категории",
-                    DocumentTitle = linkDoc.Title,
-                    LinkInstanceId = linkInstance.Id,
-                    ViewId = viewId
-                });
-            }
+            txDelete.Start();
+            DeleteViewsOfType(doc, viewType);
+            txDelete.Commit();
         }
-        return result;
-    }
-    
-    private static ElementId CreateIsometricViewWithSectionBox(Document doc, ViewFamilyType viewType, Element element)
-    {
-        ElementId viewId = ElementId.InvalidElementId;
-        using (var tx = new Transaction(doc, "Create 3D View"))
+
+        using (var tx = new Transaction(doc, "Создание видов с арматурой над парковкой"))
         {
             tx.Start();
-            var view = View3D.CreateIsometric(doc, viewType.Id);
-            var box = element.get_BoundingBox(null);
-            if (box != null)
+            foreach (var linkInstance in links)
             {
-                var expand = 0.5;
-                box.Min -= new XYZ(expand, expand, expand);
-                box.Max += new XYZ(expand, expand, expand);
-                view.SetSectionBox(box);
+                var linkDoc = linkInstance.GetLinkDocument();
+                if (linkDoc == null) continue;
+
+                var linkFittings = new FilteredElementCollector(linkDoc)
+                    .WhereElementIsNotElementType()
+                    .WherePasses(new ElementMulticategoryFilter(new[]
+                    {
+                        BuiltInCategory.OST_PipeAccessory,
+                        BuiltInCategory.OST_DuctAccessory,
+                        BuiltInCategory.OST_DuctTerminal
+                    }))
+                    .ToList();
+
+                foreach (var fitting in linkFittings)
+                {
+                    var view = CreateIsometricViewWithSectionBox(doc, viewType, fitting);
+                    var fittingInfo = new FittingInfo(fitting, linkDoc.Title, view.Id);
+
+                    view.Name = fittingInfo.ViewName;
+                    
+                    result.Add(fittingInfo);
+                }
             }
 
-            viewId = view.Id;
             tx.Commit();
         }
 
-        return viewId;
+        return result;
+    }
+    
+    private static View3D CreateIsometricViewWithSectionBox(Document doc, ViewFamilyType viewType, Element element)
+    {
+        ElementId viewId = ElementId.InvalidElementId;
+
+        var view = View3D.CreateIsometric(doc, viewType.Id);
+        var box = element.get_BoundingBox(null);
+        if (box != null)
+        {
+            var expand = 0.5;
+            box.Min -= new XYZ(expand, expand, expand);
+            box.Max += new XYZ(expand, expand, expand);
+            view.SetSectionBox(box);
+        }
+
+        return view;
+    }
+    
+    private static void DeleteViewsOfType(Document doc, ViewFamilyType viewType)
+    {
+        var viewsToDelete = new FilteredElementCollector(doc)
+            .OfClass(typeof(View3D))
+            .Cast<View3D>()
+            .Where(v => !v.IsTemplate && v.GetTypeId() == viewType.Id)
+            .Select(v => v.Id)
+            .ToList();
+
+        if (viewsToDelete.Any())
+        {
+            doc.Delete(viewsToDelete);
+        }
     }
 }

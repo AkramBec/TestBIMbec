@@ -14,10 +14,10 @@
     Width="800">
     <Grid>
         <StackPanel>
-            <Button Content="Найти арм"
+            <Button Content="Найти арматуру над парковочными местами"
                     Command="{Binding FindFittingsCommand}"
                     Margin="0,0,0,10"
-                    Width = "200"/>
+                    Width = "300"/>
             <TextBlock Text = "Найденные элементы:" FontWeight="Bold" Margin="0,10,0,5"/>
             
             <ListBox ItemsSource="{Binding Fittings}"
