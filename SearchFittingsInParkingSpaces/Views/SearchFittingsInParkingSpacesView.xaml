@@ -12,7 +12,7 @@
     WindowStartupLocation="CenterScreen"
     Title="Поиск арматуры над парковочным местом"
     Height="{Binding WindowHeight, Mode=TwoWay}"
-    Width="350">
+    Width="400">
     
     <Window.Resources>
         <conv:BooleanHiddenVisibilityConverter x:Key="BoolToVis" />
