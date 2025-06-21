@@ -12,19 +12,36 @@ namespace SearchFittingsInParkingSpaces.ViewModels
 {
     public sealed partial class SearchFittingsInParkingSpacesViewModel : ObservableObject
     {
+        private const double InitialHeight = 100;   // высота до поиска
+        private const double ExpandedHeight = 250;  // высота после поиска
+        
         private readonly UIDocument _uiDoc;
         private readonly ActionEventHandler _actionEventHandler = new ActionEventHandler();
         public SearchFittingsInParkingSpacesViewModel(UIDocument uiDoc)
         {
             _uiDoc = uiDoc;
             Fittings = new ObservableCollection<FittingInfo>();
+
+            WindowHeight = InitialHeight;
         }
+        
+        [ObservableProperty]
+        private double windowHeight;
         
         [ObservableProperty]
         private ObservableCollection<FittingInfo> fittings;
 
         [ObservableProperty]
         private FittingInfo selectedFitting;
+        
+        [ObservableProperty]
+        private bool hasRunSearch;
+        
+        [RelayCommand]
+        private void ExportCsv()
+        {
+            // здесь логика сохранения Fittings в CSV
+        }
 
         partial void OnSelectedFittingChanged(FittingInfo value)
         {
@@ -60,6 +77,9 @@ namespace SearchFittingsInParkingSpaces.ViewModels
                 
                 foreach (var fitting in results)
                     Fittings.Add(fitting);
+                
+                WindowHeight = ExpandedHeight;
+                HasRunSearch = true;
             });
         }
     }

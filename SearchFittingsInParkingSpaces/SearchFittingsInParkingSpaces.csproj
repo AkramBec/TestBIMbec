@@ -41,7 +41,7 @@
     <PropertyGroup>
         <StartAction>Program</StartAction>
         <StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
-        <StartArguments>/language RUS</StartArguments>
+        <StartArguments>/language ENG</StartArguments>
     </PropertyGroup>
 
     <!-- Build configuration -->
