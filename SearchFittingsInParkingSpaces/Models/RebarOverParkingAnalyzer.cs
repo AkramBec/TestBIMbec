@@ -7,7 +7,7 @@ public class RebarOverParkingAnalyzer
     public static List<FittingInfo> FindFittingsOverParking(UIApplication uiApp)
     {
         var uiDoc = uiApp.ActiveUIDocument;
-        var doc = uiApp.ActiveUIDocument.Document;
+        var doc = uiDoc.Document;
 
         var result = new List<FittingInfo>();
 
@@ -105,11 +105,11 @@ public class RebarOverParkingAnalyzer
         }
     }
     
-    public static View3D SwitchToSafeViewIfNeeded(UIApplication uiApp, ViewFamilyType pluginViewType)
+    public static View SwitchToSafeViewIfNeeded(UIApplication uiApp, ViewFamilyType pluginViewType)
         {
             var uiDoc = uiApp.ActiveUIDocument;
             var doc = uiDoc.Document;
-            var activeView = uiDoc.ActiveView as View3D;
+            var activeView = uiDoc.ActiveView;
 
             // Если активный вид имеет тип, совпадающий с плагинным — заменяем
             if (activeView.GetTypeId() == pluginViewType.Id)
@@ -124,7 +124,7 @@ public class RebarOverParkingAnalyzer
 
                 if (safeView != null)
                 {
-                    return safeView;
+                    return safeView as View;
                 }
     
                 // Найти ViewFamilyType для обычного 3D-вида, исключая pluginViewType
@@ -145,7 +145,7 @@ public class RebarOverParkingAnalyzer
                         default3DView.Name = "3D";
                         tx.Commit();
                         
-                        return default3DView;
+                        return default3DView as View;
                     }
                     
                 }
