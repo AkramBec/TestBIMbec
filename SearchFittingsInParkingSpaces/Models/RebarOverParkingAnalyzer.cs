@@ -9,30 +9,7 @@ public class RebarOverParkingAnalyzer
         var uiDoc = uiApp.ActiveUIDocument;
         var doc = uiDoc.Document;
 
-        RevitLinks.LinkInstances(doc);
-
-        //Удаление старых видов
-        using (var txDelete = new Transaction(doc, "Удаление старых видов"))
-        {
-            txDelete.Start();
-            ViewsOfType.Delete(doc, PluginView3D.Type);
-            txDelete.Commit();
-        }
-        
-        // Парковочные места
-        var parkingPlaces = new FilteredElementCollector(doc)
-            .OfCategory(BuiltInCategory.OST_Parking)
-            .WhereElementIsNotElementType()
-            .OfType<FamilyInstance>()
-            .ToList();
-
         var result = new List<FittingInfo>();
-
-
-        // Поиск перекрытий в АР и КР
-        FloorCollector.CollectAll(doc);
-
-        // Арматура труб и воздуховодов в связях
 
         using (var tx = new Transaction(doc, "Создание видов с арматурой над парковкой"))
         {

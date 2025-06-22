@@ -13,4 +13,14 @@ public class PluginView3D
                           vft.Name.Equals("Сгенерированный вид", StringComparison.OrdinalIgnoreCase));
         return _type;
     }
+    
+    public static void Initialize(Document doc)
+    {
+        using (var txDelete = new Transaction(doc, "Удаление старых видов"))
+        {
+            txDelete.Start();
+            ViewsOfType.Delete(doc, Type);
+            txDelete.Commit();
+        }
+    }
 }

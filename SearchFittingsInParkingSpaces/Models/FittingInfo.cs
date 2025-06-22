@@ -31,6 +31,6 @@ public class FittingInfo
 
     public override string ToString()
     {
-        return $"{ElementId} : {Discipline}, Категория: {Category}, Система: {SystemClassification}";
+        return $"{ElementId} : {Discipline}, Категория: {Category}";
     }
 }

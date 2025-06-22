@@ -67,11 +67,15 @@ namespace SearchFittingsInParkingSpaces.ViewModels
             {
                 var uiDoc = uiApp.ActiveUIDocument; 
                 var doc = uiDoc.Document;
+                RevitLinks.LinkInstances(doc);
                 PluginView3D.GetType(doc);
+                ElementCollector.GetParkingPlaces(doc);
+                FloorCollector.CollectAll(doc);
                 
                 uiDoc.ActiveView = SafeView.SwitchIfNeeded(uiApp,PluginView3D.Type);
                 
                 Fittings.Clear();
+                PluginView3D.Initialize(doc);
 
                 var results = RebarOverParkingAnalyzer.FindFittingsOverParking(uiApp);
                 
