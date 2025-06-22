@@ -67,9 +67,9 @@ namespace SearchFittingsInParkingSpaces.ViewModels
             {
                 var uiDoc = uiApp.ActiveUIDocument; 
                 var doc = uiDoc.Document;
+                PluginView3D.GetType(doc);
                 
-                var viewType = PluginView3D.GetType(doc);
-                uiDoc.ActiveView = SafeView.SwitchIfNeeded(uiApp,viewType);
+                uiDoc.ActiveView = SafeView.SwitchIfNeeded(uiApp,PluginView3D.Type);
                 
                 Fittings.Clear();
 

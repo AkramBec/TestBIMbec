@@ -9,58 +9,35 @@ public class RebarOverParkingAnalyzer
         var uiDoc = uiApp.ActiveUIDocument;
         var doc = uiDoc.Document;
 
-        var result = new List<FittingInfo>();
+        RevitLinks.LinkInstances(doc);
 
-        var viewType = PluginView3D.GetType(doc);
-
+        //Удаление старых видов
+        using (var txDelete = new Transaction(doc, "Удаление старых видов"))
+        {
+            txDelete.Start();
+            ViewsOfType.Delete(doc, PluginView3D.Type);
+            txDelete.Commit();
+        }
+        
         // Парковочные места
         var parkingPlaces = new FilteredElementCollector(doc)
             .OfCategory(BuiltInCategory.OST_Parking)
             .WhereElementIsNotElementType()
             .OfType<FamilyInstance>()
             .ToList();
-        
-        // Связи
-        
-        var links = new FilteredElementCollector(doc)
-            .OfClass(typeof(RevitLinkInstance))
-            .Cast<RevitLinkInstance>();
-        
+
+        var result = new List<FittingInfo>();
+
+
         // Поиск перекрытий в АР и КР
-        var floors = new List<Element>();
+        FloorCollector.CollectAll(doc);
 
-        floors.AddRange(new FilteredElementCollector(doc)
-            .OfCategory(BuiltInCategory.OST_Floors)
-            .WhereElementIsNotElementType());
-
-        foreach (var link in links)
-        {
-            var linkDoc = link.GetLinkDocument();
-            if (linkDoc == null) continue;
-            
-            Transform linkTransform = link.GetTransform();
-
-            var linkFloors = new FilteredElementCollector(linkDoc)
-                .OfCategory(BuiltInCategory.OST_Floors)
-                .WhereElementIsNotElementType()
-                .ToList();
-
-            floors.AddRange(linkFloors);
-        }
-
-        //Удаление старых видов
-        using (var txDelete = new Transaction(doc, "Удаление старых видов"))
-        {
-            txDelete.Start();
-            ViewsOfType.Delete(doc, viewType);
-            txDelete.Commit();
-        }
-        
         // Арматура труб и воздуховодов в связях
 
         using (var tx = new Transaction(doc, "Создание видов с арматурой над парковкой"))
         {
             tx.Start();
+            var links = RevitLinks.Links;
             foreach (var linkInstance in links)
             {
                 var linkDoc = linkInstance.GetLinkDocument();
@@ -78,7 +55,7 @@ public class RebarOverParkingAnalyzer
 
                 foreach (var fitting in linkFittings)
                 {
-                    var view = ViewsOfType.Create(doc, viewType, fitting);
+                    var view = ViewsOfType.Create(doc, PluginView3D.Type, fitting);
                     var fittingInfo = new FittingInfo(fitting, linkDoc.Title, view.Id);
 
                     view.Name = fittingInfo.ViewName;
