@@ -17,12 +17,10 @@ public class FittingInfo
         _element = element;
         DocumentTitle = documentTitle;
         ViewId = viewId;
-        
-        _titleInfo = new TitleInfo(documentTitle);
-        
+
         ElementId = element.Id.IntegerValue;
         Category = element.Category?.Name ?? "Нет категории";
-        Discipline = _titleInfo.Discipline;
+        Discipline = TitleInfo.Discipline(documentTitle);
         ViewName = $"{Discipline}_{Category}_{ElementId}";;
     }
 

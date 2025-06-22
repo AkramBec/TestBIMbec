@@ -12,8 +12,8 @@ namespace SearchFittingsInParkingSpaces.ViewModels
 {
     public sealed partial class SearchFittingsInParkingSpacesViewModel : ObservableObject
     {
-        private const double InitialHeight = 100;   // высота до поиска
-        private const double ExpandedHeight = 250;  // высота после поиска
+        private const double InitialHeight = 80;   // высота до поиска
+        private const double ExpandedHeight = 270;  // высота после поиска
         
         private readonly UIDocument _uiDoc;
         private readonly ActionEventHandler _actionEventHandler = new ActionEventHandler();
@@ -68,8 +68,8 @@ namespace SearchFittingsInParkingSpaces.ViewModels
                 var uiDoc = uiApp.ActiveUIDocument; 
                 var doc = uiDoc.Document;
                 
-                var viewType = new PluginView3D(doc).Type;
-                uiDoc.ActiveView = RebarOverParkingAnalyzer.SwitchToSafeViewIfNeeded(uiApp,viewType);
+                var viewType = PluginView3D.GetType(doc);
+                uiDoc.ActiveView = SafeView.SwitchIfNeeded(uiApp,viewType);
                 
                 Fittings.Clear();
 
