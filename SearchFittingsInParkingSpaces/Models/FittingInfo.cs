@@ -5,9 +5,12 @@ public class FittingInfo
     private readonly Element _element;
     private readonly TitleInfo _titleInfo;
     
-    public int ElementId { get; }
-    public string Category { get; }
-    public string DocumentTitle { get; }
+    public int ElementId {get;}
+    public string Category {get;}
+    public string SystemClassification {get;}
+    public string Name {get;}
+    public string Designation {get;}
+    public string DocumentTitle {get;}
     public string Discipline { get; }
     public string ViewName { get;}
     public ElementId ViewId { get;}
@@ -20,12 +23,14 @@ public class FittingInfo
 
         ElementId = element.Id.IntegerValue;
         Category = element.Category?.Name ?? "Нет категории";
+        SystemClassification = element.get_Parameter(BuiltInParameter.RBS_SYSTEM_NAME_PARAM).AsString();
+        
         Discipline = TitleInfo.Discipline(documentTitle);
         ViewName = $"{Discipline}_{Category}_{ElementId}";;
     }
 
     public override string ToString()
     {
-        return $"{ElementId} : {Discipline}, Категория: {Category}";
+        return $"{ElementId} : {Discipline}, Категория: {Category}, Система: {SystemClassification}";
     }
 }
