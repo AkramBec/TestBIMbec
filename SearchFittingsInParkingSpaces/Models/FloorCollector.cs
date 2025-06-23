@@ -12,10 +12,8 @@ public class FloorCollector
         _floors.AddRange(new FilteredElementCollector(doc)
             .OfCategory(BuiltInCategory.OST_Floors)
             .WhereElementIsNotElementType());
-        
-        var links = RevitLinks.Links;
 
-        foreach (var link in links)
+        foreach (var link in RevitLinks.Links)
         {
             var linkDoc = link.GetLinkDocument();
             if (linkDoc == null) continue;

@@ -8,6 +8,8 @@ public class RebarOverParkingAnalyzer
     {
         var uiDoc = uiApp.ActiveUIDocument;
         var doc = uiDoc.Document;
+        
+        var categories = JsonCategories.BuiltInCategories;
 
         var result = new List<FittingInfo>();
 
@@ -19,11 +21,6 @@ public class RebarOverParkingAnalyzer
             {
                 var linkDoc = linkInstance.GetLinkDocument();
                 if (linkDoc == null) continue;
-                
-                string assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                string folder = System.IO.Path.GetDirectoryName(assemblyPath);
-                string jsonPath = System.IO.Path.Combine(folder, "familyCategories.json");
-                List<BuiltInCategory> categories = CategoryLoader.LoadCategories(jsonPath);
 
                 var linkFittings = new FilteredElementCollector(linkDoc)
                     .WhereElementIsNotElementType()
