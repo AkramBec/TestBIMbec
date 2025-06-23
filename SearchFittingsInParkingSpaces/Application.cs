@@ -18,7 +18,7 @@ namespace SearchFittingsInParkingSpaces
 
         private void CreateRibbon()
         {
-            var panel = Application.CreatePanel("Машиноместо", "ТЗ Бешшар - АР");
+            var panel = Application.CreatePanel("Машиноместо", "ТЗ Бешшар");
 
             panel.AddPushButton<StartupCommand>("Поиск арматуры")
                 .SetImage("/SearchFittingsInParkingSpaces;component/Resources/Icons/RibbonIcon16.png")

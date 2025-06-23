@@ -33,7 +33,7 @@ namespace SearchFittingsInParkingSpaces.ViewModels
         private ObservableCollection<ResultInfo> fittings;
 
         [ObservableProperty]
-        private ResultInfo _selectedResult;
+        private ResultInfo selectedResult;
         
         [ObservableProperty]
         private bool hasRunSearch;
@@ -44,7 +44,7 @@ namespace SearchFittingsInParkingSpaces.ViewModels
             // здесь логика сохранения Fittings в CSV
         }
 
-        partial void OnSelectedFittingChanged(ResultInfo value)
+        partial void OnSelectedResultChanged(ResultInfo value)
         {
             if (value == null)
                 return;
