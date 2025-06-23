@@ -21,7 +21,7 @@ namespace SearchFittingsInParkingSpaces.ViewModels
         public SearchFittingsInParkingSpacesViewModel(UIDocument uiDoc)
         {
             _uiDoc = uiDoc;
-            Fittings = new ObservableCollection<FittingInfo>();
+            Fittings = new ObservableCollection<ResultInfo>();
 
             WindowHeight = InitialHeight;
         }
@@ -30,10 +30,10 @@ namespace SearchFittingsInParkingSpaces.ViewModels
         private double windowHeight;
         
         [ObservableProperty]
-        private ObservableCollection<FittingInfo> fittings;
+        private ObservableCollection<ResultInfo> fittings;
 
         [ObservableProperty]
-        private FittingInfo selectedFitting;
+        private ResultInfo _selectedResult;
         
         [ObservableProperty]
         private bool hasRunSearch;
@@ -44,7 +44,7 @@ namespace SearchFittingsInParkingSpaces.ViewModels
             // здесь логика сохранения Fittings в CSV
         }
 
-        partial void OnSelectedFittingChanged(FittingInfo value)
+        partial void OnSelectedFittingChanged(ResultInfo value)
         {
             if (value == null)
                 return;

@@ -1,6 +1,6 @@
 ﻿namespace SearchFittingsInParkingSpaces.Models;
 
-public class FittingInfo
+public class ResultInfo
 {
     private readonly Element _element;
     private readonly TitleInfo _titleInfo;
@@ -15,7 +15,7 @@ public class FittingInfo
     public string ViewName { get;}
     public ElementId ViewId { get;}
     
-    public FittingInfo(Element element, string documentTitle, ElementId viewId)
+    public ResultInfo(Element element, string documentTitle, ElementId viewId)
     {
         _element = element;
         DocumentTitle = documentTitle;

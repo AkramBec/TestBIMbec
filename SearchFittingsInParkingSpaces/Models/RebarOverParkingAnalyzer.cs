@@ -4,7 +4,7 @@ namespace SearchFittingsInParkingSpaces.Models;
 
 public class RebarOverParkingAnalyzer
 {
-    public static List<FittingInfo> FindFittingsOverParking(UIApplication uiApp)
+    public static List<ResultInfo> FindFittingsOverParking(UIApplication uiApp)
     {
         var uiDoc = uiApp.ActiveUIDocument;
         var doc = uiDoc.Document;
@@ -16,7 +16,7 @@ public class RebarOverParkingAnalyzer
         var FittingMetaDatas =
             ElementCollector.CollectAll(doc, FilterRule.ByCategories(JsonCategories.BuiltInCategories));
 
-        var result = new List<FittingInfo>();
+        var result = new List<ResultInfo>();
 
         using (var tx = new Transaction(doc, "Создание видов с арматурой над парковкой"))
         {
@@ -37,7 +37,7 @@ public class RebarOverParkingAnalyzer
                 foreach (var fitting in linkFittings)
                 {
                     var view = ViewsOfType.Create(doc, PluginView3D.Type, fitting);
-                    var fittingInfo = new FittingInfo(fitting, linkDoc.Title, view.Id);
+                    var fittingInfo = new ResultInfo(fitting, linkDoc.Title, view.Id);
 
                     view.Name = fittingInfo.ViewName;
                     
