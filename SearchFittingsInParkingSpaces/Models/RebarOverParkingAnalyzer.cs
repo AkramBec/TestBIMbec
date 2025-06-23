@@ -22,32 +22,21 @@ public class RebarOverParkingAnalyzer
         {
             tx.Start();
             
-            
-
-            foreach (var linkInstance in RevitLinks.Links)
+            foreach (var fittingMetaData  in FittingMetaDatas)
             {
-                var linkDoc = linkInstance.GetLinkDocument();
-                if (linkDoc == null) continue;
+                var fitting = fittingMetaData.Element as FamilyInstance;
+                var view = ViewsOfType.Create(doc, PluginView3D.Type, fitting);
+                var fittingInfo = new ResultInfo(fitting, fittingMetaData.DocTitle, view.Id);
 
-                var linkFittings = new FilteredElementCollector(linkDoc)
-                    .WhereElementIsNotElementType()
-                    .WherePasses(new ElementMulticategoryFilter(JsonCategories.BuiltInCategories))
-                    .ToList();
-
-                foreach (var fitting in linkFittings)
-                {
-                    var view = ViewsOfType.Create(doc, PluginView3D.Type, fitting);
-                    var fittingInfo = new ResultInfo(fitting, linkDoc.Title, view.Id);
-
-                    view.Name = fittingInfo.ViewName;
+                view.Name = fittingInfo.ViewName;
                     
-                    result.Add(fittingInfo);
-                }
+                result.Add(fittingInfo);
             }
 
-            foreach (var parking in parkingMetaDatas)
+            foreach (ElementMetaData parkingMetadata in parkingMetaDatas)
             {
-                var parkGlobalBB = CorrectBoundingBox.ComputeGlobal(parking.Element as FamilyInstance);
+                var parking = parkingMetadata.Element as FamilyInstance;
+                var parkGlobalBB = CorrectBoundingBox.ComputeGlobal(parking);
                 var minZ = parkGlobalBB.Min.Z;
             }
 

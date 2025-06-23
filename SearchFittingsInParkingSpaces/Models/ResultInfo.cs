@@ -24,13 +24,28 @@ public class ResultInfo
         ElementId = element.Id.IntegerValue;
         Category = element.Category?.Name ?? "Нет категории";
         SystemClassification = element.get_Parameter(BuiltInParameter.RBS_SYSTEM_NAME_PARAM).AsString();
-        
-        Discipline = TitleInfo.Discipline(documentTitle);
-        ViewName = $"{Discipline}_{Category}_{ElementId}";;
+
+        if (documentTitle != "")
+        {
+            Discipline = TitleInfo.Discipline(documentTitle);
+            ViewName = $"{Discipline}_{Category}_{ElementId}";
+        }
+        else
+        {
+            ViewName = $"{Category}_{ElementId}";
+        }
     }
 
     public override string ToString()
     {
-        return $"{ElementId} : {Discipline}, Категория: {Category}";
+        if (DocumentTitle != "")
+        {
+            return $"{ElementId} : {Discipline}, Категория: {Category}";
+        }
+        else
+        {
+            return $"{ElementId}, Категория: {Category}";
+        }
+        
     }
 }
