@@ -20,7 +20,6 @@ public class RebarOverParkingAnalyzer
             foreach (var parkingMetadata in parkingsCollector.ElementsMetaData)
             {
                 var parking = parkingMetadata.Element as FamilyInstance;
-                var parkGlobalBB = CorrectBoundingBox.ComputeGlobal(parking);
                 var parkBB = parking.get_BoundingBox(null);
                 var parkMinZ = parkBB.Min.Z;
                 var parkMin = parkBB.Min;
@@ -46,39 +45,25 @@ public class RebarOverParkingAnalyzer
                 LocationPoint location = parking.Location as LocationPoint;
                 XYZ origin = location.Point;                // Центр парковки
                 double rotation = location.Rotation;
-
-                List<XYZ> localCorners = new List<XYZ>
-                {
-                    new XYZ( -width / 2,-length / 2, parkMinZ),
-                    new XYZ( -width / 2,length / 2, parkMinZ),
-                    new XYZ( width / 2,length / 2, parkMinZ),
-                    new XYZ( width / 2,-length / 2, parkMinZ)
-                };
+                
                 Transform transform = Transform.Identity;
                 Transform rotationTransform  = Transform.CreateRotation(XYZ.BasisZ, rotation);
                 Transform translationTransform = Transform.CreateTranslation(origin);
                 transform = translationTransform.Multiply(rotationTransform);
                 
-                
-                List<XYZ> worldCorners = localCorners
-                    .Select(p => transform.OfPoint(p))
-                    .ToList();
-
                 Transform inverseTransform = transform.Inverse;
                 
+                var floorsMetaData = new ElementCollector(
+                    doc, FilterRule.ByCategoryAndElementFilter(BuiltInCategory.OST_Floors,bBoxFilter));
+                var floorsInfo = ElementInfo.CollectAndFinedBottomFace(floorsMetaData);
                 
                 
                 foreach (var fittingMetaData in FittingsCollector.ElementsMetaData)
                 {
                     var fitting = fittingMetaData.Element as FamilyInstance;
-                    var fittingGlobalBB = CorrectBoundingBox.ComputeGlobal(fitting);
                     var fittingBB = fitting.get_BoundingBox(null);
                     var fittingMidBB = (fittingBB.Min + fittingBB.Max) / 2;
-                    
-                    var floorsMetaData = new ElementCollector(
-                        doc, FilterRule.ByCategoryAndElementFilter(BuiltInCategory.OST_Floors,bBoxFilter));
-                    var floorsInfo = ElementInfo.CollectAndFinedBottomFace(floorsMetaData);
-                
+
                     var floorsMaybeBlocking = floorsInfo
                         .Where(f => f.originGlobal.Z > parkMinZ + 0.01 && f.originGlobal.Z < fittingMidBB.Z)
                         .Select(f => new{f.bottomFace,f.elementMetaData});

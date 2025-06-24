@@ -1,9 +1,12 @@
 ﻿
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using Nice3point.Revit.Toolkit;
 using Nice3point.Revit.Toolkit.External.Handlers;
 using SearchFittingsInParkingSpaces.Models;
@@ -41,7 +44,22 @@ namespace SearchFittingsInParkingSpaces.ViewModels
         [RelayCommand]
         private void ExportCsv()
         {
-            // здесь логика сохранения Fittings в CSV
+            var dialog = new SaveFileDialog
+            {
+                Filter = "CSV files (*.csv)|*.csv",
+                DefaultExt = ".csv",
+                FileName = "Фитинги над парковочными местами.csv"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                using var writer = new StreamWriter(dialog.FileName, false, Encoding.UTF8);
+                // заголовок
+                writer.WriteLine("Имя файла;ID;Категория;Имя системы;Наименование;Обозначение");
+                foreach (var f in Fittings)
+                {
+                    writer.WriteLine($"{f.DocumentTitle};{f.ElementId};{f.Category};{f.SystemClassification};{f.Name};{f.Designation}");
+                }
+            }
         }
 
         partial void OnSelectedResultChanged(ResultInfo value)
