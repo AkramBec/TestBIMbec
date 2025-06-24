@@ -2,19 +2,17 @@
 
 public class ElementCollector
 {
-    private static List<ElementMetaData> _elementsMetaData = new();
-    public static IReadOnlyList<ElementMetaData> ElementsMetaData  => _elementsMetaData; 
-    
-    private static List<Element> _elements;
-    public static List<Element> Elements {get=>_elements;}
+    private readonly List<ElementMetaData> _elementsMetaData = new();
+    public IReadOnlyList<ElementMetaData> ElementsMetaData  => _elementsMetaData;
 
-    public static List<ElementMetaData> CollectAll(Document doc, FilterRule filterRule)
+    public ElementCollector(Document doc, FilterRule filterRule)
     {
         _elementsMetaData.Clear();
-        _elements = new List<Element>();
-        _elements.AddRange(filterRule.Apply(doc));
         
-        _elementsMetaData.AddRange(_elements.Select(el =>new ElementMetaData(el,Transform.Identity)));
+        var elements = filterRule.Apply(doc);
+        
+        _elementsMetaData.AddRange(elements
+            .Select(el =>new ElementMetaData(el,Transform.Identity)));
 
         foreach (var link in RevitLinks.Links)
         {
@@ -22,13 +20,10 @@ public class ElementCollector
             if (linkDoc == null) continue;
             var linkTransform = link.GetTotalTransform();
 
-            var linkFloors = filterRule.Apply(linkDoc);
+            var linkElements = filterRule.Apply(linkDoc);
 
-            _elements.AddRange(linkFloors);
-
-            _elementsMetaData.AddRange(linkFloors.Select(el =>new ElementMetaData(el,linkTransform,linkDoc.Title)));
+            _elementsMetaData.AddRange(linkElements
+                .Select(el =>new ElementMetaData(el,linkTransform,linkDoc.Title)));
         }
-
-        return _elementsMetaData;
     }
 }

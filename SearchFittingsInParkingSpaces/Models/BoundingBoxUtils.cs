@@ -2,6 +2,41 @@
 
     public static class BoundingBoxUtils
 {
+    public static List<XYZ> GetOrientedBottomCorners(ElementMetaData elementMetaData)
+    {
+        // локальный bbox семейства
+        var inst = elementMetaData.Element as FamilyInstance;
+        var symBB = inst.get_BoundingBox(null);
+        // дно локального bbox
+        var localCorners = new List<XYZ>
+        {
+            new XYZ(symBB.Min.X, symBB.Min.Y, symBB.Min.Z),
+            new XYZ(symBB.Max.X, symBB.Min.Y, symBB.Min.Z),
+            new XYZ(symBB.Max.X, symBB.Max.Y, symBB.Min.Z),
+            new XYZ(symBB.Min.X, symBB.Max.Y, symBB.Min.Z)
+        };
+        // мировой Transform
+        var tr = inst.GetTransform();
+        // поворачиваем каждую в мир
+        return localCorners
+            .Select(pt => tr.OfPoint(pt))
+            .ToList();
+    }
+    
+    public static bool PointInPolygonXY(XYZ p, IList<XYZ> poly)
+    {
+        bool inside = false;
+        for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
+        {
+            var pi = poly[i];
+            var pj = poly[j];
+            // сравниваем по Y
+            if (((pi.Y > p.Y) != (pj.Y > p.Y)) &&
+                (p.X < (pj.X - pi.X) * (p.Y - pi.Y) / (pj.Y - pi.Y) + pi.X))
+                inside = !inside;
+        }
+        return inside;
+    }
     /// <summary>
     /// Создаёт плоскость, совпадающую с нижней гранью глобального BoundingBox.
     /// </summary>
