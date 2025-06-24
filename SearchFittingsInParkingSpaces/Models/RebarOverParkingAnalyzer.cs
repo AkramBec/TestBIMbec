@@ -20,44 +20,23 @@ public class RebarOverParkingAnalyzer
             foreach (var parkingMetadata in parkingsCollector.ElementsMetaData)
             {
                 var parking = parkingMetadata.Element as FamilyInstance;
+                var inverseTransform = Transformer.GetInverse(parking);
+                var length = ParameterCollector.GetFromSymbolByGuid(parking, "748a2515-4cc9-4b74-9a69-339a8d65a212");
+                var width = ParameterCollector.GetFromSymbolByGuid(parking, "8f2e4f93-9472-4941-a65d-0ac468fd6a5d");
+                
                 var parkBB = parking.get_BoundingBox(null);
-                var parkMinZ = parkBB.Min.Z;
-                var parkMin = parkBB.Min;
-                XYZ parkMax = new XYZ(parkBB.Max.X, parkBB.Max.Y,parkBB.Max.Z + 12000/304.8);
-
-                Outline parkOutline = new Outline(parkMin, parkMax);
+                Outline parkOutline = new Outline(
+                    parkBB.Min, 
+                    new XYZ(parkBB.Max.X, parkBB.Max.Y,parkBB.Max.Z + 12000/304.8));
                 BoundingBoxIntersectsFilter bBoxFilter = new BoundingBoxIntersectsFilter(parkOutline);
-                
-                var FittingsCollector = new ElementCollector(
-                    doc, FilterRule.ByCategoriesAndElementFilter(JsonCategories.BuiltInCategories,bBoxFilter));
 
-                Guid lengthGuid = new Guid("748a2515-4cc9-4b74-9a69-339a8d65a212");
-
-                Parameter lengthParam = parking.Symbol.get_Parameter(lengthGuid);
-                double length = lengthParam?.AsDouble() ?? 0;   // в футах
-                
-                Guid widthGuid = new Guid("8f2e4f93-9472-4941-a65d-0ac468fd6a5d");
-                Parameter widthParam = parking.Symbol.get_Parameter(widthGuid);
-                double width = widthParam?.AsDouble() ?? 0;   // в футах
-
-                // Построим прямоугольник в локальной системе координат (до поворота)
-                
-                LocationPoint location = parking.Location as LocationPoint;
-                XYZ origin = location.Point;                // Центр парковки
-                double rotation = location.Rotation;
-                
-                Transform transform = Transform.Identity;
-                Transform rotationTransform  = Transform.CreateRotation(XYZ.BasisZ, rotation);
-                Transform translationTransform = Transform.CreateTranslation(origin);
-                transform = translationTransform.Multiply(rotationTransform);
-                
-                Transform inverseTransform = transform.Inverse;
-                
                 var floorsMetaData = new ElementCollector(
                     doc, FilterRule.ByCategoryAndElementFilter(BuiltInCategory.OST_Floors,bBoxFilter));
                 var floorsInfo = ElementInfo.CollectAndFinedBottomFace(floorsMetaData);
                 
-                
+                var FittingsCollector = new ElementCollector(
+                    doc, FilterRule.ByCategoriesAndElementFilter(JsonCategories.BuiltInCategories,bBoxFilter));
+
                 foreach (var fittingMetaData in FittingsCollector.ElementsMetaData)
                 {
                     var fitting = fittingMetaData.Element as FamilyInstance;
@@ -65,11 +44,10 @@ public class RebarOverParkingAnalyzer
                     var fittingMidBB = (fittingBB.Min + fittingBB.Max) / 2;
 
                     var floorsMaybeBlocking = floorsInfo
-                        .Where(f => f.originGlobal.Z > parkMinZ + 0.01 && f.originGlobal.Z < fittingMidBB.Z)
+                        .Where(f => f.originGlobal.Z > parkBB.Min.Z + 0.01 && f.originGlobal.Z < fittingMidBB.Z)
                         .Select(f => new{f.bottomFace,f.elementMetaData});
                 
                     bool isBlocking = false;
-                
                     foreach (var floor in floorsMaybeBlocking)
                     {
                         var ptLocal = floor.elementMetaData.Transform.Inverse.OfPoint(fittingMidBB);
@@ -81,7 +59,7 @@ public class RebarOverParkingAnalyzer
                         }
                     }
 
-                    if (isBlocking == false)
+                    if (!isBlocking)
                     {
                         XYZ localParkFittingPoint = inverseTransform.OfPoint(fittingMidBB);
                         bool isInside = 
@@ -90,19 +68,11 @@ public class RebarOverParkingAnalyzer
 
                         if (isInside)
                         {
-                            var viewBB = BoundingBoxUtils
-                                .CombineBoundingBoxes(new List<BoundingBoxXYZ>
-                                    { fittingBB, parkBB });
+                            var viewBB = BoundingBoxUtils.CombineBoundingBoxes(new List<BoundingBoxXYZ> { fittingBB, parkBB });
                             var view = ViewsOfType.Create(doc, PluginView3D.Type, viewBB);
                             var fittingInfo = new ResultInfo(fittingMetaData.Element, fittingMetaData.DocTitle,
                                 view.Id);
-                            try
-                            {
-                                view.Name = fittingInfo.ViewName;
-                            }
-                            catch
-                            {
-                            }
+                            try { view.Name = fittingInfo.ViewName; } catch { }
 
                             result.Add(fittingInfo);
                         }

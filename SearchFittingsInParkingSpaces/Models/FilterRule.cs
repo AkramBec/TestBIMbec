@@ -23,15 +23,6 @@ public class FilterRule
             .WhereElementIsNotElementType()
             .ToList());
     }
-    
-    public static FilterRule ByCategories(List<BuiltInCategory> builtInCategories)
-    {
-        return new FilterRule(doc=>
-            new FilteredElementCollector(doc)
-            .WhereElementIsNotElementType()
-            .WherePasses(new ElementMulticategoryFilter(builtInCategories))
-            .ToList());
-    }
     public static FilterRule ByCategoryAndElementFilter(BuiltInCategory builtInCategory, ElementFilter filter)
     {
         return new FilterRule(doc=> 

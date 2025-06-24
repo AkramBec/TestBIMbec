@@ -1,6 +1,4 @@
-﻿using Autodesk.Revit.DB;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.IO;
 
 namespace SearchFittingsInParkingSpaces;

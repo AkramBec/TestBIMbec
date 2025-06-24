@@ -4,17 +4,14 @@ public class ViewsOfType
 {
     public static View3D Create(Document doc, ViewFamilyType viewType, BoundingBoxXYZ bBox)
     {
-        ElementId viewId = ElementId.InvalidElementId;
-
         var view = View3D.CreateIsometric(doc, viewType.Id);
         if (bBox != null)
         {
-            var expand = 0.5;
+            var expand = 0.2;
             bBox.Min -= new XYZ(expand, expand, expand);
             bBox.Max += new XYZ(expand, expand, expand);
             view.SetSectionBox(bBox);
         }
-
         return view;
     }
 

@@ -3,14 +3,9 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.DB;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
-using Nice3point.Revit.Toolkit;
 using Nice3point.Revit.Toolkit.External.Handlers;
 using SearchFittingsInParkingSpaces.Models;
-using FilterRule = SearchFittingsInParkingSpaces.Models.FilterRule;
 
 namespace SearchFittingsInParkingSpaces.ViewModels
 {
