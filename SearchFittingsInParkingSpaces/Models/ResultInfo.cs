@@ -40,7 +40,7 @@ public class ResultInfo
     {
         if (DocumentTitle != "")
         {
-            return $"{ElementId} : {Discipline}, Категория: {Category}";
+            return $"{Discipline} : {ElementId}, Категория: {Category}";
         }
         else
         {

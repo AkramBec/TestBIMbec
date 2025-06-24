@@ -32,4 +32,22 @@ public class FilterRule
             .WherePasses(new ElementMulticategoryFilter(builtInCategories))
             .ToList());
     }
+    public static FilterRule ByCategoryAndElementFilter(BuiltInCategory builtInCategory, ElementFilter filter)
+    {
+        return new FilterRule(doc=> 
+            new FilteredElementCollector(doc)
+                .OfCategory(builtInCategory)
+                .WhereElementIsNotElementType()
+                .WherePasses(filter)
+                .ToList());
+    }
+    public static FilterRule ByCategoriesAndElementFilter(List<BuiltInCategory> builtInCategories, ElementFilter filter)
+    {
+        return new FilterRule(doc=>
+            new FilteredElementCollector(doc)
+                .WhereElementIsNotElementType()
+                .WherePasses(new ElementMulticategoryFilter(builtInCategories))
+                .WherePasses(filter)
+                .ToList());
+    }
 }
