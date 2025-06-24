@@ -26,7 +26,7 @@ public class ElementCollector
 
             _elements.AddRange(linkFloors);
 
-            _elementsMetaData.AddRange(linkFloors.Select(el =>new ElementMetaData(el,Transform.Identity,linkDoc.Title)));
+            _elementsMetaData.AddRange(linkFloors.Select(el =>new ElementMetaData(el,linkTransform,linkDoc.Title)));
         }
 
         return _elementsMetaData;

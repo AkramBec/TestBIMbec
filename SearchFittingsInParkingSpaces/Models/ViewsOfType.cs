@@ -2,18 +2,17 @@
 
 public class ViewsOfType
 {
-    public static View3D Create(Document doc, ViewFamilyType viewType, Element element)
+    public static View3D Create(Document doc, ViewFamilyType viewType, BoundingBoxXYZ bBox)
     {
         ElementId viewId = ElementId.InvalidElementId;
 
         var view = View3D.CreateIsometric(doc, viewType.Id);
-        var box = element.get_BoundingBox(null);
-        if (box != null)
+        if (bBox != null)
         {
             var expand = 0.5;
-            box.Min -= new XYZ(expand, expand, expand);
-            box.Max += new XYZ(expand, expand, expand);
-            view.SetSectionBox(box);
+            bBox.Min -= new XYZ(expand, expand, expand);
+            bBox.Max += new XYZ(expand, expand, expand);
+            view.SetSectionBox(bBox);
         }
 
         return view;

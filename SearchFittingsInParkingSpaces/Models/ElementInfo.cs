@@ -8,19 +8,23 @@ public class ElementInfo
     private static PlanarFace _bottomFace;
     public static PlanarFace BottomFace { get => _bottomFace; }
 
-    public static List<(Element element, PlanarFace bottomFace)> CollectAndFinedBottomFace (Document doc, FilterRule filterRule)
+    //private static List<(ElementMetaData elementMetaData, PlanarFace bottomFace)> _bottomOfElement;
+    //public static List<(ElementMetaData elementMetaData, PlanarFace bottomFace, )> BottomOfElement  => _bottomOfElement;
+
+    public static List<(ElementMetaData elementMetaData, PlanarFace bottomFace, XYZ originGlobal)> CollectAndFinedBottomFace (Document doc, FilterRule filterRule)
     {
+        var bottomOfElement = new List<(ElementMetaData elementMetaData, PlanarFace bottomFace, XYZ originGlobal)>();
         ElementCollector.CollectAll(doc, filterRule);
-        var result = new List<(Element, PlanarFace)>();
         foreach (ElementMetaData elementMetaData in ElementCollector.ElementsMetaData)
         {
             _element = elementMetaData.Element;
             var floorGeometry = new ElementGeometry(elementMetaData);
             _bottomFace = floorGeometry.GetBottomFace();
+            var originGlobal = floorGeometry.OriginGlobal;
 
-            result.Add((_element, _bottomFace));
+            bottomOfElement.Add((elementMetaData, _bottomFace, originGlobal));
         }
 
-        return result;
+        return bottomOfElement;
     }
 }
