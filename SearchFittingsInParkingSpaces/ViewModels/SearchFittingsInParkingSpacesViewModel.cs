@@ -14,7 +14,7 @@ namespace SearchFittingsInParkingSpaces.ViewModels
     public sealed partial class SearchFittingsInParkingSpacesViewModel : ObservableObject
     {
         private const double InitialHeight = 80;   // высота до поиска
-        private const double ExpandedHeight = 270;  // высота после поиска
+        private const double ExpandedHeight = 320;  // высота после поиска
         
         private readonly UIDocument _uiDoc;
         private readonly ActionEventHandler _actionEventHandler = new ActionEventHandler();

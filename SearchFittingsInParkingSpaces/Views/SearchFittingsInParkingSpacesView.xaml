@@ -31,7 +31,7 @@
                 
                 <ListBox ItemsSource="{Binding Fittings}"
                          SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
-                         Height="100"/>
+                         Height="150"/>
                 <TextBlock Text = "Для перехода на вид, нажмите на соответствующую строку" FontWeight="UltraLight" Margin="5,0,0,0" FontSize="10" FontStyle="Italic"/>
                 
                 <Button Content="Экспорт в CSV"

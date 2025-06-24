@@ -24,7 +24,7 @@ public class RebarOverParkingAnalyzer
                 var parkBB = parking.get_BoundingBox(null);
                 var parkMinZ = parkBB.Min.Z;
                 var parkMin = parkBB.Min;
-                XYZ parkMax = new XYZ(parkBB.Max.X, parkBB.Max.Y,parkBB.Max.Z + 15000/304.8);
+                XYZ parkMax = new XYZ(parkBB.Max.X, parkBB.Max.Y,parkBB.Max.Z + 12000/304.8);
 
                 Outline parkOutline = new Outline(parkMin, parkMax);
                 BoundingBoxIntersectsFilter bBoxFilter = new BoundingBoxIntersectsFilter(parkOutline);
@@ -63,22 +63,7 @@ public class RebarOverParkingAnalyzer
                 List<XYZ> worldCorners = localCorners
                     .Select(p => transform.OfPoint(p))
                     .ToList();
-                
-                Plane sketchPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, worldCorners[0]); // Плоскость по Z
-                SketchPlane sp = SketchPlane.Create(doc, sketchPlane);
-                
-                for (int i = 0; i < worldCorners.Count; i++)
-                {
-                    XYZ start = worldCorners[i];
-                    XYZ end = worldCorners[(i + 1) % worldCorners.Count];
 
-                    Line line = Line.CreateBound(start, end);
-                    doc.Create.NewModelCurve(line, sp);
-                }
-                
-                
-                
-                
                 Transform inverseTransform = transform.Inverse;
                 
                 
